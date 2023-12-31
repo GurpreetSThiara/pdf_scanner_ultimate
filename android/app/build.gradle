@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.guri.pdf_scanner_ultimate"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 
     compileOptions {
