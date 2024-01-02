@@ -16,7 +16,13 @@ class ImageViewer extends GetView<PdfController> {
 
     return  Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple.shade400,
+       title: Text("View Pdf"),
+        actions: [
+          ElevatedButton(
+            onPressed: () => controller.generatePdf(),
+            child: Text('Generate PDF'),
+          ),
+        ],
       ),
       body: Obx(() {
         return controller.selectedImages.isNotEmpty?Padding(
@@ -29,7 +35,7 @@ class ImageViewer extends GetView<PdfController> {
                 decoration: BoxDecoration(color: Colors.grey),
                 height: imageHeight,
                 width:width ,
-                child:Image.file(File(controller.currentImage.path)) ,
+                child:Image.memory(controller.currentImage) ,
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16),
@@ -40,34 +46,29 @@ class ImageViewer extends GetView<PdfController> {
                       onPressed: controller.canGoToPrevious
                           ? () => controller.goToPreviousImage()
                           : null,
-                      style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                            return controller.canGoToPrevious
-                                ? Colors.deepPurple
-                                : Colors.grey;
-                          },
-                        ),
+
+                      child: Row(
+                        children: [
+                          Icon(Icons.arrow_back_ios,color: controller.canGoToPrevious?Colors.deepPurple:Colors.grey),
+                          Text('Prev',style: TextStyle(color:controller.canGoToPrevious
+                              ? Colors.deepPurple
+                              : Colors.grey),),
+                        ],
                       ),
-                      child: Text('Prev',style: TextStyle(color: Colors.deepPurple),),
                     ),
 
                     TextButton(
-                      onPressed: controller.canGoToPrevious
-                          ? () {
+                      onPressed:  () {
                         Get.to(const EditView());
-                      }
-                          : null,
-                      style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                            return Colors.grey;
-                          },
-                        ),
+                      },
+
+
+                      child: Row(
+                        children: [
+                          Text('Edit',style: TextStyle(color: Colors.deepPurple,fontWeight: FontWeight.w500),),
+
+                        ],
                       ),
-                      child: Text('Edit',style: TextStyle(color: Colors.deepPurple),),
                     ),
 
 
@@ -75,24 +76,20 @@ class ImageViewer extends GetView<PdfController> {
                       onPressed: controller.canGoToNext
                           ? () => controller.goToNextImage()
                           : null,
-                      style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                            return controller.canGoToNext
-                                ? Colors.deepPurple.shade400
-                                : Colors.grey;
-                          },
-                        ),
+
+                      child: Row(
+                        children: [
+                          Text('Next',style: TextStyle(color: controller.canGoToNext?Colors.deepPurple:Colors.grey)),
+                          Icon(Icons.arrow_forward_ios,color: controller.canGoToNext?Colors.deepPurple:Colors.grey,)
+                        ],
                       ),
-                      child: Text('Next',style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-        ):Text("");
+        ):Text("empty");
       })
     );
   }

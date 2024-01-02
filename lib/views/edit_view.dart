@@ -1,6 +1,10 @@
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_editor/image_editor.dart';
 import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
 import 'dart:io';
 
@@ -15,7 +19,13 @@ class EditView extends GetView<PdfController> {
     double imageHeight= MediaQuery.of(context).size.height/1.6;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple.shade300,
+        title: Text("Edit pdf"),
+        actions: [
+          ElevatedButton(onPressed: (){
+            final ExtendedImageEditorState? state = imageKey.currentState;
+            handleImageSave(state);
+          }, child: Text("Save"))
+        ],
       ),
       body: Obx(
             () => controller.selectedImages.isNotEmpty
@@ -28,10 +38,11 @@ class EditView extends GetView<PdfController> {
                   color: Colors.grey
                 ),
                 height: imageHeight,
-                child:ExtendedImage.file(
+                child:ExtendedImage.memory(
+                  controller.currentImage,
 
 
-                  File(controller.currentImage.path),
+
                   extendedImageEditorKey: imageKey,
                   mode: ExtendedImageMode.editor,
                   fit: BoxFit.contain,
@@ -124,13 +135,14 @@ class EditView extends GetView<PdfController> {
               Icon(
                 icon,
                 size: 30.0,
-                color: Colors.grey.shade600,
+                color: Colors.deepPurple.shade400,
               ),
               SizedBox(height: 4.0),
               Text(
                 iconName,
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: Colors.deepPurple.shade400,
+                  fontWeight: FontWeight.bold,
                   fontSize: 14.0,
                 ),
               ),
@@ -140,4 +152,63 @@ class EditView extends GetView<PdfController> {
       ),
     );
   }
+
+  Future<void> handleImageSave(ExtendedImageEditorState? state) async {
+    Uint8List? x=  await  cropImageDataWithNativeLibrary(state: state!);
+    controller.updateImage(image: x);
+    Get.back();
+
+  }
+  Future<Uint8List?> cropImageDataWithNativeLibrary(
+      {required ExtendedImageEditorState state}) async {
+
+    Rect cropRect = state.getCropRect()!;
+    if (state.widget.extendedImageState.imageProvider is ExtendedResizeImage) {
+      final ImmutableBuffer buffer =
+      await ImmutableBuffer.fromUint8List(state.rawImageData);
+      final ImageDescriptor descriptor = await ImageDescriptor.encoded(buffer);
+
+      final double widthRatio = descriptor.width / state.image!.width;
+      final double heightRatio = descriptor.height / state.image!.height;
+      cropRect = Rect.fromLTRB(
+        cropRect.left * widthRatio,
+        cropRect.top * heightRatio,
+        cropRect.right * widthRatio,
+        cropRect.bottom * heightRatio,
+      );
+    }
+
+    final EditActionDetails action = state.editAction!;
+
+    final int rotateAngle = action.rotateAngle.toInt();
+    final bool flipHorizontal = action.flipY;
+    final bool flipVertical = action.flipX;
+    final Uint8List img = state.rawImageData;
+
+    final ImageEditorOption option = ImageEditorOption();
+
+    if (action.needCrop) {
+      option.addOption(ClipOption.fromRect(cropRect));
+    }
+
+    if (action.needFlip) {
+      option.addOption(
+          FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
+    }
+
+    if (action.hasRotateAngle) {
+      option.addOption(RotateOption(rotateAngle));
+    }
+
+    final DateTime start = DateTime.now();
+    final Uint8List? result = await ImageEditor.editImage(
+      image: img,
+      imageEditorOption: option,
+    );
+
+    print('${DateTime.now().difference(start)} ：total time');
+    return result;
+  }
+
+
 }

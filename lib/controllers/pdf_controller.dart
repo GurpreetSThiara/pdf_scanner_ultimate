@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -9,8 +10,9 @@ import 'package:extended_image/extended_image.dart';
 
 class PdfController extends GetxController {
   RxInt currentIndex = 0.obs;
-  List<XFile> selectedImages = <XFile>[].obs;
-  XFile get currentImage => selectedImages[currentIndex.value];
+  List<Uint8List> selectedImages = <Uint8List>[].obs;
+  List<XFile> xFiles = <XFile>[].obs;
+  Uint8List get currentImage => selectedImages[currentIndex.value];
 
   bool get canGoToPrevious => currentIndex.value > 0;
 
@@ -37,11 +39,22 @@ class PdfController extends GetxController {
 
   Future<void> pickImages() async {
     List<XFile>? images = await ImagePicker().pickMultiImage();
+    xFiles.addAll(images);
     if (images != null && images.isNotEmpty) {
-      selectedImages.assignAll(images);
+      for (var image in images) {
+        final bytes = await image.readAsBytes();
+        print(bytes);
+        selectedImages.add(bytes);
+      }
     }
   }
 
+
+  updateImage({Uint8List? image}){
+    if(image!=null) {
+      selectedImages[currentIndex.value] = image;
+    }
+  }
   Future<void> generatePdf() async {
     print("pppppppppppppppppppppppppppppppppppp");
 
@@ -52,9 +65,8 @@ class PdfController extends GetxController {
 
     final pdf = pw.Document();
 
-    for (var image in selectedImages) {
-      final imageFile = File(image.path);
-      final imageBytes = await imageFile.readAsBytes();
+    for (var imageBytes in selectedImages) {
+
 
       pdf.addPage(pw.Page(
         build: (pw.Context context) {
