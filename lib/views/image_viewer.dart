@@ -1,96 +1,129 @@
-
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
 import 'package:pdf_scanner_ultimate/views/edit_view.dart';
+import 'package:pdf_scanner_ultimate/views/rearrange.dart';
 
 class ImageViewer extends GetView<PdfController> {
   const ImageViewer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double imageHeight= MediaQuery.of(context).size.height/1.8;
-    double width= MediaQuery.of(context).size.width;
+    double imageHeight = MediaQuery.of(context).size.height / 2;
 
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
-       title: Text("View Pdf"),
+        title: Text("PDF Viewer"),
         actions: [
-          ElevatedButton(
-            onPressed: () => controller.generatePdf(),
-            child: Text('Generate PDF'),
+          IconButton(
+            onPressed: () =>Get.to(PreviewPdf),
+            icon: Icon(Icons.preview),
           ),
         ],
       ),
-      body: Obx(() {
-        return controller.selectedImages.isNotEmpty?Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(color: Colors.grey),
-                height: imageHeight,
-                width:width ,
-                child:Image.memory(controller.currentImage) ,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Obx(
+              () {
+            return controller.selectedImages.isNotEmpty
+                ? _buildImageViewerBody(imageHeight)
+                : const Center(child: CircularProgressIndicator());
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageViewerBody(double imageHeight) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text('page ''${controller.currentIndex.value+1}'' of' ' ${controller.selectedImages.length}'),
+        ),
+        Expanded(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors:  [
+                  Colors.grey, // Start color
+                  Colors.deepPurple, // End color
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: controller.canGoToPrevious
-                          ? () => controller.goToPreviousImage()
-                          : null,
 
-                      child: Row(
-                        children: [
-                          Icon(Icons.arrow_back_ios,color: controller.canGoToPrevious?Colors.deepPurple:Colors.grey),
-                          Text('Prev',style: TextStyle(color:controller.canGoToPrevious
-                              ? Colors.deepPurple
-                              : Colors.grey),),
-                        ],
-                      ),
-                    ),
-
-                    TextButton(
-                      onPressed:  () {
-                        Get.to(const EditView());
-                      },
-
-
-                      child: Row(
-                        children: [
-                          Text('Edit',style: TextStyle(color: Colors.deepPurple,fontWeight: FontWeight.w500),),
-
-                        ],
-                      ),
-                    ),
-
-
-                    TextButton(
-                      onPressed: controller.canGoToNext
-                          ? () => controller.goToNextImage()
-                          : null,
-
-                      child: Row(
-                        children: [
-                          Text('Next',style: TextStyle(color: controller.canGoToNext?Colors.deepPurple:Colors.grey)),
-                          Icon(Icons.arrow_forward_ios,color: controller.canGoToNext?Colors.deepPurple:Colors.grey,)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.memory(controller.currentImage,fit: BoxFit.contain,),
+            ),
           ),
-        ):Text("empty");
-      })
+
+        ),
+        SizedBox(height: 16),
+        _buildButtonRow(),
+        SizedBox(height: 16),
+        _buildNavigationRow(),
+        SizedBox(height: 32),
+      ],
+    );
+  }
+
+  Widget _buildButtonRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ElevatedButton(
+          onPressed: () {Get.to(Rearrange());},
+          child: Text('Rearrange'),
+        ),
+        ElevatedButton(
+          onPressed: () => controller.generatePdf(),
+          child: Text('Generate PDF'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavigationRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildNavigationButton(
+          onPressed: controller.canGoToPrevious
+              ? () => controller.goToPreviousImage()
+              : null,
+          icon: Icons.arrow_back_ios,
+        ),
+        _buildNavigationButton(
+          onPressed: () {
+            Get.to(const EditView());
+          },
+          icon: Icons.edit,
+        ),
+        _buildNavigationButton(
+          onPressed: controller.canGoToNext
+              ? () => controller.goToNextImage()
+              : null,
+          icon: Icons.arrow_forward_ios,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavigationButton({
+    required VoidCallback? onPressed,
+    required IconData icon,
+  }) {
+    return CircleAvatar(
+      backgroundColor: onPressed != null ? Colors.deepPurple : Colors.grey,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, color: Colors.white),
+      ),
     );
   }
 }

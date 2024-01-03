@@ -5,6 +5,8 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_editor/image_editor.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
 import 'dart:io';
 
@@ -13,6 +15,7 @@ class EditView extends GetView<PdfController> {
 
   @override
   Widget build(BuildContext context) {
+
     final GlobalKey<ExtendedImageEditorState> imageKey =GlobalKey<ExtendedImageEditorState>();
 
 
@@ -54,6 +57,7 @@ class EditView extends GetView<PdfController> {
                     controller.updateAspectRatio(imgWidth, imgHeight);
 
 
+
                     return EditorConfig(
                       maxScale: 8.0,
                       cropRectPadding: EdgeInsets.all(20.0),
@@ -89,6 +93,7 @@ class EditView extends GetView<PdfController> {
                         // }),
                         card(icon: Icons.flip,iconName: "Flip",onTap: (){
                           imageKey.currentState?.flip();
+
 
 
                         }),
@@ -154,8 +159,20 @@ class EditView extends GetView<PdfController> {
   }
 
   Future<void> handleImageSave(ExtendedImageEditorState? state) async {
-    Uint8List? x=  await  cropImageDataWithNativeLibrary(state: state!);
-    controller.updateImage(image: x);
+    Uint8List? bytes=  await  cropImageDataWithNativeLibrary(state: state!);
+    // Directory tempDir = await getTemporaryDirectory();
+    // String tempPath = tempDir.path;
+    //
+    // // Create a temporary file
+    // File tempFile = File('$tempPath/temp_edited_file.jpg');
+
+    // // Write the Uint8List to the file
+    // await tempFile.writeAsBytes(x);
+    //
+    // // Create an XFile from the temporary file
+    // XFile xFile = XFile.fromData(bytes!);
+
+    controller.updateImage(image: bytes);
     Get.back();
 
   }
@@ -199,6 +216,7 @@ class EditView extends GetView<PdfController> {
     if (action.hasRotateAngle) {
       option.addOption(RotateOption(rotateAngle));
     }
+
 
     final DateTime start = DateTime.now();
     final Uint8List? result = await ImageEditor.editImage(

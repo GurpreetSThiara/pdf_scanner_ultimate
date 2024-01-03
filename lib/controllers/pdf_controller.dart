@@ -10,6 +10,8 @@ import 'package:extended_image/extended_image.dart';
 
 class PdfController extends GetxController {
   RxInt currentIndex = 0.obs;
+  RxInt currentPage = 1.obs;
+
   List<Uint8List> selectedImages = <Uint8List>[].obs;
   List<XFile> xFiles = <XFile>[].obs;
   Uint8List get currentImage => selectedImages[currentIndex.value];
@@ -28,22 +30,33 @@ class PdfController extends GetxController {
   void goToPreviousImage() {
     if (canGoToPrevious) {
       currentIndex.value--;
+
     }
   }
 
   void goToNextImage() {
     if (canGoToNext) {
       currentIndex.value++;
+
     }
   }
 
+  clearSelectedImages(){
+    selectedImages.clear();
+  }
+
+  updateSelectedImages(List<Uint8List> images){
+     if(images.isNotEmpty){
+       selectedImages=images;
+     }
+  }
   Future<void> pickImages() async {
     List<XFile>? images = await ImagePicker().pickMultiImage();
     xFiles.addAll(images);
     if (images != null && images.isNotEmpty) {
       for (var image in images) {
         final bytes = await image.readAsBytes();
-        print(bytes);
+
         selectedImages.add(bytes);
       }
     }
@@ -121,4 +134,15 @@ class PdfController extends GetxController {
 
     // Open the PDF within the app
     // OpenFile.open(file.path);
+  }
+  void reorderImages(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1; // Adjust index if the item is moved down in the list
+    }
+
+    final movedItem = selectedImages.removeAt(oldIndex);
+    selectedImages.insert(newIndex, movedItem);
+
+    // Notify listeners to update the UI
+    update();
   }}
