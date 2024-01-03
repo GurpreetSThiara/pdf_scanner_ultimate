@@ -22,6 +22,12 @@ class PdfController extends GetxController {
 
   RxDouble initialAspectRatio = 1.0.obs;
 
+  Rx<pw.Document> pdf = pw.Document().obs;
+
+  Rx<Uint8List> bytes = Uint8List(0).obs;
+
+  Rx<Directory> downloadsDirectory = Directory('').obs;
+
   void updateAspectRatio(double width, double height) {
     initialAspectRatio.value = width / height;
   }
@@ -60,6 +66,7 @@ class PdfController extends GetxController {
         selectedImages.add(bytes);
       }
     }
+    getAddress();
   }
 
 
@@ -68,6 +75,8 @@ class PdfController extends GetxController {
       selectedImages[currentIndex.value] = image;
     }
   }
+
+
   Future<void> generatePdf() async {
     print("pppppppppppppppppppppppppppppppppppp");
 
@@ -76,12 +85,12 @@ class PdfController extends GetxController {
       return;
     }
 
-    final pdf = pw.Document();
+    final generatedPdf = pw.Document();
 
     for (var imageBytes in selectedImages) {
 
 
-      pdf.addPage(pw.Page(
+      generatedPdf.addPage(pw.Page(
         build: (pw.Context context) {
           return pw.Center(
             child: pw.Image(pw.MemoryImage(imageBytes)),
@@ -90,12 +99,20 @@ class PdfController extends GetxController {
       ));
     }
 
-    await saveAndOpenPdf(pdf, 'image_pdf');
+    pdf.value = generatedPdf;
+
+    bytes.value=await generatedPdf.save();
+
+
+
+
+
+
     // Get.snackbar('PDF Generated', 'Saved at ${file.path}');
   }
 
 
-  Future<void> saveAndOpenPdf(pw.Document pdf, String name) async {
+  Future<void> saveAndOpenPdf(String name) async {
     // Check for storage permission
     var status = await Permission.storage.request();
 
@@ -105,7 +122,7 @@ class PdfController extends GetxController {
       return;
     }
 
-    final bytes = await pdf.save();
+   // final bytes = await pdf.save();
 
     // Get the downloads directory
     Directory? downloadsDirectory = await DownloadsPath.downloadsDirectory();
@@ -126,7 +143,7 @@ class PdfController extends GetxController {
     final file = await File('$directoryPath/$name.pdf').create();
 
     // Write the bytes to the file
-    await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes.value);
 
     // Display a snackbar with a message
     Get.snackbar('PDF Saved', 'Saved at $directoryPath',
@@ -145,4 +162,14 @@ class PdfController extends GetxController {
 
     // Notify listeners to update the UI
     update();
-  }}
+  }
+
+
+  Future<void> getAddress() async {
+    final x =await DownloadsPath.downloadsDirectory();
+    if(x!=null) {
+      downloadsDirectory.value = x;
+    }
+
+  }
+}

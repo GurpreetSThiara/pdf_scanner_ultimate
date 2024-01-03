@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
 import 'package:pdf_scanner_ultimate/views/edit_view.dart';
+import 'package:pdf_scanner_ultimate/views/preview_pdf.dart';
 import 'package:pdf_scanner_ultimate/views/rearrange.dart';
 
 class ImageViewer extends GetView<PdfController> {
   const ImageViewer({Key? key}) : super(key: key);
+
+  handleViewPdf()async{
+
+    await controller.generatePdf();
+    Get.to(PreviewPdf());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +23,7 @@ class ImageViewer extends GetView<PdfController> {
         title: Text("PDF Viewer"),
         actions: [
           IconButton(
-            onPressed: () =>Get.to(PreviewPdf),
+            onPressed: handleViewPdf,
             icon: Icon(Icons.preview),
           ),
         ],
