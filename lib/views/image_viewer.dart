@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
+import 'package:pdf_scanner_ultimate/controllers/create_pdf_controller.dart';
 import 'package:pdf_scanner_ultimate/views/edit_view.dart';
 import 'package:pdf_scanner_ultimate/views/preview_pdf.dart';
 import 'package:pdf_scanner_ultimate/views/rearrange.dart';
 
-class ImageViewer extends GetView<PdfController> {
+class ImageViewer extends GetView<CreatePdfController> {
   const ImageViewer({Key? key}) : super(key: key);
 
   handleViewPdf()async{

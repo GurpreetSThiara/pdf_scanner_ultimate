@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
+import 'package:pdf_scanner_ultimate/controllers/create_pdf_controller.dart';
 import 'package:flutter/material.dart';
 
-class Rearrange extends GetView<PdfController> {
+class Rearrange extends GetView<CreatePdfController> {
   const Rearrange({Key? key}) : super(key: key);
 
   @override

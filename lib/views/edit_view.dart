@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:image_editor/image_editor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
+import 'package:pdf_scanner_ultimate/controllers/create_pdf_controller.dart';
 import 'dart:io';
 
-class EditView extends GetView<PdfController> {
+class EditView extends GetView<CreatePdfController> {
   const EditView({Key? key}) : super(key: key);
 
   @override

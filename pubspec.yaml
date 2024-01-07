@@ -46,8 +46,10 @@ dependencies:
   image:
   file_picker:
   printing: ^5.11.1
-  advance_pdf_viewer:
+  pdf_manipulator: ^0.5.9
   alh_pdf_view: ^1.4.0
+  hive: ^2.2.3
+  hive_flutter:
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +61,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  build_runner:
+  hive_generator:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

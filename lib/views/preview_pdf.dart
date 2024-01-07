@@ -5,11 +5,17 @@ import 'package:alh_pdf_view/view/alh_pdf_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lecle_downloads_path_provider/lecle_downloads_path_provider.dart';
-import 'package:pdf_scanner_ultimate/controllers/pdf_controller.dart';
+import 'package:pdf_scanner_ultimate/controllers/create_pdf_controller.dart';
+import 'package:pdf_scanner_ultimate/controllers/hive_controller.dart';
 
-class PreviewPdf extends GetView<PdfController> {
+class PreviewPdf extends GetView<CreatePdfController> {
+
+  final HiveController hiveController = Get.put(HiveController());
+
+
 
   PreviewPdf({Key? key}) : super(key: key);
+
   AlhPdfViewController? alhPdfViewController;
 
 
@@ -21,22 +27,24 @@ class PreviewPdf extends GetView<PdfController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Preview pdf"),
+        title: alhPdfViewController!=null? Text("Preview pdf"):Text("pdf ${alhPdfViewController?.getCurrentPage()} of ${alhPdfViewController?.getPageCount()}"),
         actions: [
           ElevatedButton(
             onPressed: () {
               _showSaveDialog(context);
+
             },
             child: const Text('Save'),
           )
         ],
       ),
-      body: AlhPdfView(
+      body:  AlhPdfView(
         onViewCreated: (controller) {
           alhPdfViewController = controller;
         },
         bytes: controller.bytes.value,
         showScrollbar: true,
+
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -80,7 +88,9 @@ class PreviewPdf extends GetView<PdfController> {
                 Get.back();
                 // Call the saveAndOpenPdf function with the entered PDF name
                 if(_textFieldController.text=="" || _textFieldController.text.isEmpty){
-                  controller.saveAndOpenPdf(DateTime.now().toString());
+                  var name = DateTime.now().toString();
+                  controller.saveAndOpenPdf(name);
+
                 }
                 else{
                   controller.saveAndOpenPdf(_textFieldController.text);
