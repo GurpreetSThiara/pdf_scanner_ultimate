@@ -60,7 +60,7 @@ class HomeView extends GetView<CreatePdfController> {
                               icon:Icons.picture_as_pdf,
                               title: "Scan PDF",
                               subTitle: "create a new pdf",
-                              onTap: handleSelectImages,
+                              onTap: (){handleSelectImages(context);},
                           width: width),
                           customTile(
                             icon: Icons.edit,
@@ -145,9 +145,27 @@ class HomeView extends GetView<CreatePdfController> {
     );
   }
 
-  void handleSelectImages() async {
-    await controller.pickImages();
-    Get.to(const ImageViewer());
+  void handleSelectImages(BuildContext context) async {
+
+    showDialog(context: context, builder: (_){
+      return AlertDialog(
+        title: const Text('Choose Images From'),
+        content:Row(
+          children: [
+            IconButton(onPressed: ()async{
+              await controller.pickImagesFromCamera();
+              Get.to(const ImageViewer());
+
+            }, icon: Icon(Icons.camera_alt)),
+            IconButton(onPressed: () async {
+              await controller.pickImagesFroGallery();
+              Get.to(const ImageViewer());
+            }, icon: Icon(Icons.image))
+          ],
+        ) ,
+      );
+    });
+
   }
 
   handleMergePdfs() async {

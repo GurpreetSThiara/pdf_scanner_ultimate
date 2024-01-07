@@ -66,7 +66,17 @@ class CreatePdfController extends GetxController {
        selectedImages=images;
      }
   }
-  Future<void> pickImages() async {
+  pickImagesFromCamera() async {
+    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if(image!=null){
+      xFiles.add(image);
+      final bytes = await image.readAsBytes();
+
+      selectedImages.add(bytes);
+    }
+
+  }
+  Future<void> pickImagesFroGallery() async {
     List<XFile>? images = await ImagePicker().pickMultiImage();
     xFiles.addAll(images);
     if (images != null && images.isNotEmpty) {
@@ -83,6 +93,16 @@ class CreatePdfController extends GetxController {
   updateImage({Uint8List? image}){
     if(image!=null) {
       selectedImages[currentIndex.value] = image;
+    }
+  }
+
+  addImageAtIndex( bool isCamera) async {
+    final image = await ImagePicker().pickImage(source: isCamera? ImageSource.camera:ImageSource.gallery);
+    if(image!=null){
+      xFiles.add(image);
+      final bytes = await image.readAsBytes();
+
+      selectedImages.insert(currentIndex.value, bytes);
     }
   }
 
@@ -191,5 +211,17 @@ class CreatePdfController extends GetxController {
 
   setBytes(Uint8List pdfBytes){
     bytes.value = pdfBytes;
+  }
+
+  deleteImage(){
+
+    if(selectedImages.last == currentImage && selectedImages.first!=selectedImages.last) {
+      selectedImages.remove(currentImage);
+      currentIndex -=1;
+    }else{
+      selectedImages.remove(currentImage);
+
+    }
+
   }
 }
