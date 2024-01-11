@@ -197,6 +197,7 @@ class EditView extends GetView<CreatePdfController> {
 
     final EditActionDetails action = state.editAction!;
 
+
     final int rotateAngle = action.rotateAngle.toInt();
     final bool flipHorizontal = action.flipY;
     final bool flipVertical = action.flipX;
@@ -206,6 +207,7 @@ class EditView extends GetView<CreatePdfController> {
 
     if (action.needCrop) {
       option.addOption(ClipOption.fromRect(cropRect));
+
     }
 
     if (action.needFlip) {

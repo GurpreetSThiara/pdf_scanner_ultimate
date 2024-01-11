@@ -33,49 +33,45 @@ class CreatePdfController extends GetxController {
 
   @override
   void onInit() {
-
     super.onInit();
   }
-
 
   void updateAspectRatio(double width, double height) {
     initialAspectRatio.value = width / height;
   }
 
-
   void goToPreviousImage() {
     if (canGoToPrevious) {
       currentIndex.value--;
-
     }
   }
 
   void goToNextImage() {
     if (canGoToNext) {
       currentIndex.value++;
-
     }
   }
 
-  clearSelectedImages(){
+  clearSelectedImages() {
     selectedImages.clear();
   }
 
-  updateSelectedImages(List<Uint8List> images){
-     if(images.isNotEmpty){
-       selectedImages=images;
-     }
+  updateSelectedImages(List<Uint8List> images) {
+    if (images.isNotEmpty) {
+      selectedImages = images;
+    }
   }
+
   pickImagesFromCamera() async {
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
-    if(image!=null){
+    if (image != null) {
       xFiles.add(image);
       final bytes = await image.readAsBytes();
 
       selectedImages.add(bytes);
     }
-
   }
+
   Future<void> pickImagesFroGallery() async {
     List<XFile>? images = await ImagePicker().pickMultiImage();
     xFiles.addAll(images);
@@ -89,16 +85,16 @@ class CreatePdfController extends GetxController {
     getAddress();
   }
 
-
-  updateImage({Uint8List? image}){
-    if(image!=null) {
+  updateImage({Uint8List? image}) {
+    if (image != null) {
       selectedImages[currentIndex.value] = image;
     }
   }
 
-  addImageAtIndex( bool isCamera) async {
-    final image = await ImagePicker().pickImage(source: isCamera? ImageSource.camera:ImageSource.gallery);
-    if(image!=null){
+  addImageAtIndex(bool isCamera) async {
+    final image = await ImagePicker()
+        .pickImage(source: isCamera ? ImageSource.camera : ImageSource.gallery);
+    if (image != null) {
       xFiles.add(image);
       final bytes = await image.readAsBytes();
 
@@ -106,20 +102,18 @@ class CreatePdfController extends GetxController {
     }
   }
 
-
   Future<void> generatePdf() async {
     print("pppppppppppppppppppppppppppppppppppp");
 
     if (selectedImages.isEmpty) {
-      Get.snackbar('No Images Selected', 'Please select images to generate PDF');
+      Get.snackbar(
+          'No Images Selected', 'Please select images to generate PDF');
       return;
     }
 
     final generatedPdf = pw.Document();
 
     for (var imageBytes in selectedImages) {
-
-
       generatedPdf.addPage(pw.Page(
         build: (pw.Context context) {
           return pw.Center(
@@ -131,18 +125,10 @@ class CreatePdfController extends GetxController {
 
     pdf.value = generatedPdf;
 
-    bytes.value=await generatedPdf.save();
-
-
-
-
-
-
-
+    bytes.value = await generatedPdf.save();
 
     // Get.snackbar('PDF Generated', 'Saved at ${file.path}');
   }
-
 
   Future<void> saveAndOpenPdf(String name) async {
     // Check for storage permission
@@ -154,7 +140,7 @@ class CreatePdfController extends GetxController {
       return;
     }
 
-   // final bytes = await pdf.save();
+    // final bytes = await pdf.save();
 
     // Get the downloads directory
     Directory? downloadsDirectory = await DownloadsPath.downloadsDirectory();
@@ -170,7 +156,7 @@ class CreatePdfController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return;
     }
-    var path ='$directoryPath/$name.pdf';
+    var path = '$directoryPath/$name.pdf';
     // Create a File object with the appropriate path
     final file = await File(path).create();
 
@@ -183,11 +169,10 @@ class CreatePdfController extends GetxController {
 
     hiveController.addPdf(name, path);
 
-
-
     // Open the PDF within the app
     // OpenFile.open(file.path);
   }
+
   void reorderImages(int oldIndex, int newIndex) {
     if (newIndex > oldIndex) {
       newIndex -= 1; // Adjust index if the item is moved down in the list
@@ -200,28 +185,24 @@ class CreatePdfController extends GetxController {
     update();
   }
 
-
   Future<void> getAddress() async {
-    final x =await DownloadsPath.downloadsDirectory();
-    if(x!=null) {
+    final x = await DownloadsPath.downloadsDirectory();
+    if (x != null) {
       downloadsDirectory.value = x;
     }
-
   }
 
-  setBytes(Uint8List pdfBytes){
+  setBytes(Uint8List pdfBytes) {
     bytes.value = pdfBytes;
   }
 
-  deleteImage(){
-
-    if(selectedImages.last == currentImage && selectedImages.first!=selectedImages.last) {
+  deleteImage() {
+    if (selectedImages.last == currentImage &&
+        selectedImages.first != selectedImages.last) {
       selectedImages.remove(currentImage);
-      currentIndex -=1;
-    }else{
+      currentIndex -= 1;
+    } else {
       selectedImages.remove(currentImage);
-
     }
-
   }
 }
