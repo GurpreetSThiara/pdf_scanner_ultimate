@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:pdf_scanner_ultimate/controllers/create_pdf_controller.dart';
-import 'package:pdf_scanner_ultimate/views/x.dart';
+
 
 import 'controllers/hive_controller.dart';
 import 'models/pdf_data.dart';

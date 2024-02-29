@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdf_scanner_ultimate/controllers/edit_pdf_controller.dart';
 import 'package:pdf_scanner_ultimate/controllers/hive_controller.dart';
-import 'package:pdf_scanner_ultimate/views/edit_view.dart';
 import 'package:pdf_scanner_ultimate/views/image_viewer.dart';
 import 'package:pdf_scanner_ultimate/views/preview_pdf.dart';
-import 'dart:io';
+import 'package:pdf_scanner_ultimate/views/signature.dart';
 import '../controllers/create_pdf_controller.dart';
 
 class HomeView extends GetView<CreatePdfController> {
@@ -83,8 +82,10 @@ class HomeView extends GetView<CreatePdfController> {
 
                               title: "Split PDFs",
                               subTitle: "merge multiple pdf files",
-                              onTap: handleMergePdfs,
+                              onTap: handleSplitPdfs,
                               width:width),
+
+                          customTile(width: width,title: "Signatures",onTap: handleSignatureTap,subTitle: "signatures")
 
 
                         ],
@@ -168,7 +169,27 @@ class HomeView extends GetView<CreatePdfController> {
 
   }
 
+  handleSignatureTap(){
+    Get.to(SignaturePage());
+  }
+
   handleMergePdfs() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowMultiple: true,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      List<String> paths = [];
+      for (var i in result.files) {
+        paths.add(i.path!);
+      }
+      await editPdfController.mergeMultiplePdfs(paths);
+      Get.to(PreviewPdf());
+    }
+  }
+  handleSplitPdfs() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowMultiple: true,
